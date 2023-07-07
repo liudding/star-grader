@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+option java_package = "com.nxlinkstar.stargrader.data";
+option java_multiple_files = true;
+
+message User {
+  string user_id = 1;
+  string user_name = 2;
+  string school_id = 3;
+  string school_code = 4;
+  string school_name = 5;
+  string school_short_name = 6;
+}

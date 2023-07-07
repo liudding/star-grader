@@ -10,7 +10,13 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.nxlinkstar.stargrader.StarGraderApplication.Companion.context
+import com.nxlinkstar.stargrader.data.UserDataStore.dataStore
 import com.nxlinkstar.stargrader.databinding.ActivityMainBinding
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -28,6 +34,17 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
+
+        lifecycleScope.launch {
+            context.dataStore.data.first()
+            // You should also handle IOExceptions here.
+        }
+
+//        navController.addOnDestinationChangedListener { _, destination, _ ->
+//            if (destination.id == R.id.LoginFragment) {
+////                binding.toolbar.navigationIcon = null
+//            }
+//        }
 
 
 //        binding.fab.setOnClickListener { view ->

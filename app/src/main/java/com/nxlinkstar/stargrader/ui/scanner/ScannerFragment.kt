@@ -7,8 +7,14 @@ import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.nxlinkstar.stargrader.R
@@ -33,7 +39,7 @@ class ScannerFragment : Fragment() {
     private var _binding: FragmentScannerBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var mUSBMonitor: USBMonitor
+    private  var mUSBMonitor: USBMonitor? = null
 
     // TODO: get resolution size from settings
     private var width = 640
@@ -99,6 +105,13 @@ class ScannerFragment : Fragment() {
     }
 
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        @Suppress("DEPRECATION")
+        setHasOptionsMenu(true)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -110,18 +123,44 @@ class ScannerFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(ScannerViewModel::class.java)
+        viewModel = ViewModelProvider(this)[ScannerViewModel::class.java]
         // TODO: Use the ViewModel
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        intiCamera()
+//        setupMenu()
 
-//        binding.buttonToScanner.setOnClickListener {
-//            findNavController().navigate(R.id.action_ScannerFragment_to_HomeFragment)
-//        }
+//        intiCamera()
+
+    }
+
+    @Suppress("DEPRECATION")
+    @Deprecated("Deprecated in Java")
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.menu_scanner, menu)
+    }
+
+    /**
+     * 这个方法会让 返回键失效
+     */
+    private fun setupMenu() {
+        (requireActivity() as MenuHost).addMenuProvider(object : MenuProvider {
+            override fun onPrepareMenu(menu: Menu) {
+                // Handle for example visibility of menu items
+            }
+
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.menu_scanner, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                // Validate and handle the selected menu item
+                return true
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     override fun onDestroyView() {
@@ -133,15 +172,15 @@ class ScannerFragment : Fragment() {
     override fun onStart() {
         super.onStart()
 
-        mUSBMonitor.register()
-        UVCCameraUtil.requestRGBCameraPermission(requireActivity(), 300, mUSBMonitor)
+//        mUSBMonitor.register()
+//        UVCCameraUtil.requestRGBCameraPermission(requireActivity(), 300, mUSBMonitor!!)
     }
 
     override fun onStop() {
         super.onStop()
 //        LogUtils.d(TAG, "onStop")
-        UVCCameraUtil.releaseRGBCamera()
-        mUSBMonitor.unregister()
+//        UVCCameraUtil.releaseRGBCamera()
+//        mUSBMonitor.unregister()
     }
 
 

@@ -8,6 +8,8 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
@@ -15,24 +17,36 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.SavedStateHandle
+import androidx.navigation.fragment.findNavController
 import com.nxlinkstar.stargrader.databinding.FragmentLoginBinding
 
 import com.nxlinkstar.stargrader.R
 
 class LoginFragment : Fragment() {
 
-    private lateinit var loginViewModel: LoginViewModel
-    private var _binding: FragmentLoginBinding? = null
+    companion object {
+        const val LOGIN_SUCCESSFUL: String = "LOGIN_SUCCESSFUL"
+    }
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
+
+    private val loginViewModel: LoginViewModel by activityViewModels<LoginViewModel>(factoryProducer = { LoginViewModelFactory() })
+    private lateinit var savedStateHandle: SavedStateHandle
+
+    private var _binding: FragmentLoginBinding? = null
     private val binding get() = _binding!!
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
 
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
         return binding.root
@@ -41,8 +55,11 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        loginViewModel = ViewModelProvider(this, LoginViewModelFactory())
-            .get(LoginViewModel::class.java)
+
+        savedStateHandle = findNavController().previousBackStackEntry!!.savedStateHandle
+        savedStateHandle[LOGIN_SUCCESSFUL] = false
+
+
 
         val usernameEditText = binding.username
         val passwordEditText = binding.password
@@ -72,6 +89,8 @@ class LoginFragment : Fragment() {
                 }
                 loginResult.success?.let {
                     updateUiWithUser(it)
+                    savedStateHandle[LOGIN_SUCCESSFUL] = true
+                    findNavController().popBackStack()
                 }
             })
 

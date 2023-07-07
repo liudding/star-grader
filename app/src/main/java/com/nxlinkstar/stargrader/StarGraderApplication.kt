@@ -6,10 +6,10 @@ import android.content.Context
 class StarGraderApplication: Application() {
 
     companion object {
-        var context: Application? = null
+        lateinit var context: Application
 
         fun getApplication(): Context {
-            return context!!
+            return context
         }
 
     }

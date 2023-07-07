@@ -4,11 +4,11 @@
     tools:context="com.nxlinkstar.stargrader.MainActivity"
     >
 
-<!--    <item-->
-<!--        android:id="@+id/action_change_workbook"-->
-<!--        android:title="@string/change_workbook"-->
-<!--        app:showAsAction="ifRoom"-->
-<!--        />-->
+    <item
+        android:id="@+id/action_change_workbook"
+        android:title="@string/change_workbook"
+        app:showAsAction="ifRoom"
+        />
 
     <item
         android:id="@+id/action_settings"
