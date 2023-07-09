@@ -2,6 +2,7 @@ package com.nxlinkstar.stargrader.ui.home
 
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -67,7 +68,10 @@ class HomeFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
+        Log.d("Home", "onActivityCreated")
+
         if (!loginRepository.isLoggedIn) {
+            Log.d("Home", "nav to login")
             val navController = findNavController()
             navController.navigate(R.id.LoginFragment)
         }

@@ -1,6 +1,8 @@
 package com.nxlinkstar.stargrader.data
 
-enum class SUBJECTS(code: String, name: String) {
+enum class SUBJECTS(val code: String, val label: String) {
+
+
     MATH("SX", "数学"),
     CHINESE("YW", "语文"),
     ENGLISH("YY", "英语"),

@@ -18,13 +18,13 @@ object UserDataStore {
 
     val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user")
 
-    private val ACCESS_TOKEN_KEY = stringPreferencesKey("ACCESS_TOKEN")
-    private val USER_ID_KEY = stringPreferencesKey("USER_ID")
-    private val USER_NAME_KEY = stringPreferencesKey("USER_NAME")
-    private val SCHOOL_ID_KEY = stringPreferencesKey("SCHOOL_ID")
-    private val SCHOOL_NAME_KEY = stringPreferencesKey("SCHOOL_NAME")
-    private val SCHOOL_SHORT_NAME_KEY = stringPreferencesKey("SCHOOL_SHORT_NAME")
-    private val SCHOOL_CODE_KEY = stringPreferencesKey("SCHOOL_CODE")
+     val ACCESS_TOKEN_KEY = stringPreferencesKey("ACCESS_TOKEN")
+     val USER_ID_KEY = stringPreferencesKey("USER_ID")
+     val USER_NAME_KEY = stringPreferencesKey("USER_NAME")
+     val SCHOOL_ID_KEY = stringPreferencesKey("SCHOOL_ID")
+     val SCHOOL_NAME_KEY = stringPreferencesKey("SCHOOL_NAME")
+     val SCHOOL_SHORT_NAME_KEY = stringPreferencesKey("SCHOOL_SHORT_NAME")
+     val SCHOOL_CODE_KEY = stringPreferencesKey("SCHOOL_CODE")
 
 
      val userIdFlow: Flow<String?> = StarGraderApplication.context.dataStore.data.map {

@@ -19,4 +19,6 @@
     <string name="scan_workbook">拍练习册</string>
     <string name="change_workbook">切换练习册</string>
     <string name="login">登录</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

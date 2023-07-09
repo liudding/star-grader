@@ -1,6 +1,5 @@
 import com.google.protobuf.gradle.*
 
-
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
     alias(libs.plugins.androidApplication)
@@ -68,10 +67,16 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 
     implementation(libs.okhttp)
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4") // 协程(版本自定)
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+//    implementation 'com.squareup.okhttp3:okhttp:4.10.0' // 要求OkHttp4以上
+    implementation("com.github.liangjingkanji:Net:3.5.8")
 
     implementation(libs.protobuf.java)
     implementation("io.grpc:grpc-stub:1.45.1")
     implementation("io.grpc:grpc-protobuf:1.45.1")
+
+    implementation("com.google.code.gson:gson:2.10.1")
 
 }
 

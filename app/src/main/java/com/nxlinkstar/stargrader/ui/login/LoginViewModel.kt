@@ -1,5 +1,6 @@
 package com.nxlinkstar.stargrader.ui.login
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -8,6 +9,9 @@ import com.nxlinkstar.stargrader.data.LoginRepository
 import com.nxlinkstar.stargrader.data.Result
 
 import com.nxlinkstar.stargrader.R
+import com.nxlinkstar.stargrader.utils.Api
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel() {
 
@@ -23,14 +27,19 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
 
     fun login(username: String, password: String) {
         // can be launched in a separate asynchronous job
-        val result = loginRepository.login(username, password)
 
-        if (result is Result.Success) {
-            _loginResult.value =
-                LoginResult(success = LoggedInUserView(displayName = result.data.name))
-        } else {
-            _loginResult.value = LoginResult(error = R.string.login_failed)
+        GlobalScope.launch {
+            val result = loginRepository.login(username, password)
+
+            Log.d("LoginVM", result.toString())
+
+            if (result is Result.Success) {
+                _loginResult.postValue(LoginResult(success = LoggedInUserView(displayName = result.data.name)))
+            } else {
+                _loginResult.postValue(LoginResult(error = R.string.login_failed))
+            }
         }
+
     }
 
     fun loginDataChanged(username: String, password: String) {

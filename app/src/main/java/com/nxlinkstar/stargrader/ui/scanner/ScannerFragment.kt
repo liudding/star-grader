@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.hardware.usb.UsbDevice
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.Menu
@@ -17,9 +18,13 @@ import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.sidesheet.SideSheetDialog
+import com.nxlinkstar.stargrader.ItemListDialogFragment
 import com.nxlinkstar.stargrader.R
+import com.nxlinkstar.stargrader.data.SUBJECTS
 import com.nxlinkstar.stargrader.databinding.FragmentHomeBinding
 import com.nxlinkstar.stargrader.databinding.FragmentScannerBinding
+import com.nxlinkstar.stargrader.databinding.ScanTargetBinding
 import com.nxlinkstar.stargrader.utils.ImageFileUtil
 import com.nxlinkstar.stargrader.utils.YuvUtils
 import com.serenegiant.usb.USBMonitor
@@ -38,6 +43,10 @@ class ScannerFragment : Fragment() {
 
     private var _binding: FragmentScannerBinding? = null
     private val binding get() = _binding!!
+
+    private lateinit var scanTargetBinding: ScanTargetBinding
+
+    private lateinit var sideSheetDialog: SideSheetDialog
 
     private  var mUSBMonitor: USBMonitor? = null
 
@@ -117,8 +126,12 @@ class ScannerFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentScannerBinding.inflate(inflater, container, false)
-        return binding.root
 
+
+        sideSheetDialog = SideSheetDialog(requireContext());
+        sideSheetDialog.setContentView(R.layout.scanner_side_sheet)
+
+        return binding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -130,7 +143,41 @@ class ScannerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-//        setupMenu()
+
+        binding.scanTarget.cellSubject.setOnClickListener{
+            val list = listOf(
+                PickerFragment.Item(SUBJECTS.CHINESE.label, SUBJECTS.CHINESE.code),
+                PickerFragment.Item(SUBJECTS.MATH.label, SUBJECTS.MATH.code),
+                PickerFragment.Item(SUBJECTS.ENGLISH.label, SUBJECTS.ENGLISH.code),
+                PickerFragment.Item(SUBJECTS.PHYSICS.label, SUBJECTS.PHYSICS.code),
+                PickerFragment.Item(SUBJECTS.CHEMISTRY.label, SUBJECTS.CHEMISTRY.code),
+            )
+            val dialog = PickerFragment.newInstance(list, "选择科目")
+            dialog.setOnItemSelectedListener(object: PickerFragment.OnItemSelectedListener {
+                override fun onItemSelectedListener(position: Int) {
+                    val item = list[position]
+                    binding.scanTarget.subject.text = item.label
+                }
+
+            })
+            fragmentManager?.let { it1 -> dialog.show(it1, "SUBJECT_DIALOG") }
+        }
+//        binding.chan.setOnClickListener {
+//            findNavController().navigate(R.id.action_HomeFragment_to_ScannerFragment)
+//        }
+
+//        sideSheetDialog.show()
+
+//        val dd = PickerFragment.newInstance(, "11")
+//        fragmentManager?.let { dd.show(it, "aa") }
+
+
+//        val subjectCell = sideSheetDialog.findViewById<View>(R.id.subject)
+//        val dialog = PickerFragment()
+//        fragmentManager?.let { dialog.show(it, "DD") }
+//        subjectCell?.setOnClickListener(
+//
+//        )
 
 //        intiCamera()
 
@@ -142,6 +189,20 @@ class ScannerFragment : Fragment() {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.menu_scanner, menu)
     }
+
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+//        // Handle action bar item clicks here. The action bar will
+//        // automatically handle clicks on the Home/Up button, so long
+//        // as you specify a parent activity in AndroidManifest.xml.
+//        return when (item.itemId) {
+//            R.id.action_change_workbook ->  {
+//                sideSheetDialog.show()
+//                return false
+//            }
+//            else -> super.onOptionsItemSelected(item)
+//        }
+//    }
+
 
     /**
      * 这个方法会让 返回键失效

@@ -16,9 +16,9 @@ import java.nio.ByteBuffer;
 public class YuvUtils {
     private static final String TAG = YuvUtils.class.getSimpleName();
 
-    private static RenderScript rs = null;
-    private static ScriptIntrinsicYuvToRGB yuvToRgbIntrinsic = null;
-    private static ScriptIntrinsicYuvToRGB yuvToRgbIntrinsicRGB = null;
+    private static volatile RenderScript rs = null;
+    private static volatile ScriptIntrinsicYuvToRGB yuvToRgbIntrinsic = null;
+    private static volatile ScriptIntrinsicYuvToRGB yuvToRgbIntrinsicRGB = null;
 
 //    private static Type.Builder nv21Type, rgbaType;
 //    private static Allocation in, out;
