@@ -15,7 +15,6 @@ import okio.use
 import org.json.JSONObject
 import org.json.JSONTokener
 import java.io.IOException
-import com.drake.net.utils.scopeNetLife
 
 
 /**

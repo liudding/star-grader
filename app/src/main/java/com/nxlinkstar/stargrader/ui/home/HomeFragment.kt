@@ -39,18 +39,14 @@ class HomeFragment : Fragment() {
 
         val navController = findNavController()
 
-//        val currentBackStackEntry = navController.currentBackStackEntry!!
-//        val savedStateHandle = currentBackStackEntry.savedStateHandle
-//        savedStateHandle.getLiveData<Boolean>(LoginFragment.LOGIN_SUCCESSFUL)
-//            .observe(currentBackStackEntry, Observer { success ->
-//                if (!success) {
-//                    val startDestination = navController.graph.startDestination
-//                    val navOptions = NavOptions.Builder()
-//                        .setPopUpTo(startDestination, true)
-//                        .build()
-//                    navController.navigate(startDestination, null, navOptions)
-//                }
-//            })
+        val currentBackStackEntry = navController.currentBackStackEntry!!
+        val savedStateHandle = currentBackStackEntry.savedStateHandle
+        savedStateHandle.getLiveData<Boolean>(LoginFragment.LOGIN_SUCCESSFUL)
+            .observe(currentBackStackEntry, Observer { success ->
+                if (success) {
+                    binding.username.text = "nihao"
+                }
+            })
     }
 
 
@@ -60,6 +56,21 @@ class HomeFragment : Fragment() {
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.username.text = loginRepository.user?.name ?: ""
+
+        loginViewModel.loginResult.observe(viewLifecycleOwner, Observer {
+            binding.username.text = it.success?.displayName
+        })
+
+        binding.buttonToScanner.setOnClickListener {
+            findNavController().navigate(R.id.action_HomeFragment_to_ScannerFragment)
+        }
     }
 
 
@@ -92,13 +103,6 @@ class HomeFragment : Fragment() {
 //        })
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        binding.buttonToScanner.setOnClickListener {
-            findNavController().navigate(R.id.action_HomeFragment_to_ScannerFragment)
-        }
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()

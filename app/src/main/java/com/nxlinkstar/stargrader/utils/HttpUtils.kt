@@ -94,6 +94,7 @@ object HttpUtils {
             realUrl = request.url.toString()
             val response = client.newCall(request).execute()
             str = response.body?.string()
+            Log.d(TAG, "resp: " + str)
             result = if (clazz == String::class.java) {
                 str as? T
             } else{

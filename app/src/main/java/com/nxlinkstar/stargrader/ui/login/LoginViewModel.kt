@@ -10,6 +10,7 @@ import com.nxlinkstar.stargrader.data.Result
 
 import com.nxlinkstar.stargrader.R
 import com.nxlinkstar.stargrader.utils.Api
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -25,6 +26,7 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
 
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     fun login(username: String, password: String) {
         // can be launched in a separate asynchronous job
 

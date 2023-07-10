@@ -15,7 +15,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.sidesheet.SideSheetDialog
@@ -25,6 +28,8 @@ import com.nxlinkstar.stargrader.data.SUBJECTS
 import com.nxlinkstar.stargrader.databinding.FragmentHomeBinding
 import com.nxlinkstar.stargrader.databinding.FragmentScannerBinding
 import com.nxlinkstar.stargrader.databinding.ScanTargetBinding
+import com.nxlinkstar.stargrader.ui.login.LoginViewModel
+import com.nxlinkstar.stargrader.ui.login.LoginViewModelFactory
 import com.nxlinkstar.stargrader.utils.ImageFileUtil
 import com.nxlinkstar.stargrader.utils.YuvUtils
 import com.serenegiant.usb.USBMonitor
@@ -39,7 +44,7 @@ class ScannerFragment : Fragment() {
         fun newInstance() = ScannerFragment()
     }
 
-    private lateinit var viewModel: ScannerViewModel
+    private val viewModel: ScannerViewModel by viewModels<ScannerViewModel>()
 
     private var _binding: FragmentScannerBinding? = null
     private val binding get() = _binding!!
@@ -136,32 +141,82 @@ class ScannerFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this)[ScannerViewModel::class.java]
         // TODO: Use the ViewModel
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        viewModel.subjectState.observe(viewLifecycleOwner, Observer{
+            binding.scanTarget.subject.text = it?.label ?: ""
+        })
+        viewModel.textbookState.observe(viewLifecycleOwner, Observer{
+            binding.scanTarget.textbook.text = it?.name ?: ""
+        })
+        viewModel.workbookState.observe(viewLifecycleOwner, Observer{
+            binding.scanTarget.workbook.text = it?.name ?: ""
+        })
+
+
 
         binding.scanTarget.cellSubject.setOnClickListener{
-            val list = listOf(
-                PickerFragment.Item(SUBJECTS.CHINESE.label, SUBJECTS.CHINESE.code),
-                PickerFragment.Item(SUBJECTS.MATH.label, SUBJECTS.MATH.code),
-                PickerFragment.Item(SUBJECTS.ENGLISH.label, SUBJECTS.ENGLISH.code),
-                PickerFragment.Item(SUBJECTS.PHYSICS.label, SUBJECTS.PHYSICS.code),
-                PickerFragment.Item(SUBJECTS.CHEMISTRY.label, SUBJECTS.CHEMISTRY.code),
-            )
+            val list = viewModel.subjects.map {
+                PickerFragment.Item(it.label, it.code)
+            }
+
             val dialog = PickerFragment.newInstance(list, "选择科目")
             dialog.setOnItemSelectedListener(object: PickerFragment.OnItemSelectedListener {
                 override fun onItemSelectedListener(position: Int) {
                     val item = list[position]
-                    binding.scanTarget.subject.text = item.label
+                    viewModel.subjectChanged(item.value)
                 }
 
             })
             fragmentManager?.let { it1 -> dialog.show(it1, "SUBJECT_DIALOG") }
         }
+
+        binding.scanTarget.cellTextbook.setOnClickListener{
+            if (viewModel.textbooksState.value == null) {
+              return@setOnClickListener
+            }
+
+            val list = viewModel.textbooksState.value!!.map {
+                PickerFragment.Item(it.name, it.id)
+            }
+
+            val dialog = PickerFragment.newInstance(list, "选择教材")
+            dialog.setOnItemSelectedListener(object: PickerFragment.OnItemSelectedListener {
+                override fun onItemSelectedListener(position: Int) {
+                    val item = list[position]
+                    viewModel.textbookChanged(item.value)
+                }
+
+            })
+            fragmentManager?.let { it1 -> dialog.show(it1, "TEXTBOOK_DIALOG") }
+        }
+
+        binding.scanTarget.cellWorkbook.setOnClickListener{
+            if (viewModel.workbooksState.value == null) {
+                return@setOnClickListener
+            }
+
+            val list = viewModel.workbooksState.value!!.map {
+                PickerFragment.Item(it.name, it.id)
+            }
+
+            val dialog = PickerFragment.newInstance(list, "选择练习册")
+            dialog.setOnItemSelectedListener(object: PickerFragment.OnItemSelectedListener {
+                override fun onItemSelectedListener(position: Int) {
+                    val item = list[position]
+                    viewModel.workbookChanged(item.value)
+                }
+
+            })
+            fragmentManager?.let { it1 -> dialog.show(it1, "WORKBOOK_DIALOG") }
+        }
+
+
+
 //        binding.chan.setOnClickListener {
 //            findNavController().navigate(R.id.action_HomeFragment_to_ScannerFragment)
 //        }
@@ -183,12 +238,12 @@ class ScannerFragment : Fragment() {
 
     }
 
-    @Suppress("DEPRECATION")
-    @Deprecated("Deprecated in Java")
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.menu_scanner, menu)
-    }
+//    @Suppress("DEPRECATION")
+//    @Deprecated("Deprecated in Java")
+//    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+//        super.onCreateOptionsMenu(menu, inflater)
+//        inflater.inflate(R.menu.menu_scanner, menu)
+//    }
 
 //    override fun onOptionsItemSelected(item: MenuItem): Boolean {
 //        // Handle action bar item clicks here. The action bar will

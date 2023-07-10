@@ -60,23 +60,23 @@ dependencies {
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation(libs.androidx.datastore.preferences)
-    implementation(libs.androidx.datastore)
+//    implementation(libs.androidx.datastore)
 
 
 
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 
     implementation(libs.okhttp)
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4") // 协程(版本自定)
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+//    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4") // 协程(版本自定)
+//    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
 //    implementation 'com.squareup.okhttp3:okhttp:4.10.0' // 要求OkHttp4以上
-    implementation("com.github.liangjingkanji:Net:3.5.8")
+//    implementation("com.github.liangjingkanji:Net:3.5.8")
 
-    implementation(libs.protobuf.java)
-    implementation("io.grpc:grpc-stub:1.45.1")
-    implementation("io.grpc:grpc-protobuf:1.45.1")
+//    implementation(libs.protobuf.java)
+//    implementation("io.grpc:grpc-stub:1.45.1")
+//    implementation("io.grpc:grpc-protobuf:1.45.1")
 
-    implementation("com.google.code.gson:gson:2.10.1")
+    implementation(libs.gson)
 
 }
 

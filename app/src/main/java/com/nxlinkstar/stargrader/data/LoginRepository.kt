@@ -48,7 +48,7 @@ class LoginRepository() {
 
 
     // in-memory cache of the loggedInUser object
-    private var user: LoggedInUser? = null
+    var user: LoggedInUser? = null
         private set
 
     val isLoggedIn: Boolean
@@ -60,15 +60,13 @@ class LoginRepository() {
         // @see https://developer.android.com/training/articles/keystore
         user = null
 
-
-
         GlobalScope.launch {
-
             val store = StarGraderApplication.context.dataStore.data.first()
-           if (store[USER_ID_KEY].isNullOrEmpty()) {
-               return@launch
-           }
+            if (store[USER_ID_KEY].isNullOrEmpty()) {
+                return@launch
+            }
 
+            Log.d("REPO", "user: " + store[USER_ID_KEY] + " " + store[ACCESS_TOKEN_KEY])
             user = LoggedInUser(
                 store[ACCESS_TOKEN_KEY]!!,
                 store[USER_ID_KEY]!!,
@@ -120,7 +118,8 @@ class LoginRepository() {
             data.getString("schUuid"),
             school.getString("schCode"),
             school.getString("schName"),
-            school.getString("schShortName"))
+            school.getString("schShortName")
+        )
 
         setLoggedInUser(user)
 

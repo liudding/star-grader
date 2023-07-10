@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="100dp"
     app:layout_constraintTop_toTopOf="parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/cardview_light_background">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cell_subject"
@@ -20,7 +21,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:textColor="@color/black"
+            android:textColor="@color/gray"
             android:text="科目"
             tools:text="科目" />
 
@@ -54,7 +55,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:textColor="@color/black"
+            android:textColor="@color/gray"
             android:text="教材"
             tools:text="教材" />
 
@@ -86,7 +87,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:textColor="@color/black"
+            android:textColor="@color/gray"
             android:text="练习册"
             tools:text="练习册" />
 
