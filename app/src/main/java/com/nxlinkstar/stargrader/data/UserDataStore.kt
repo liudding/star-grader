@@ -18,16 +18,18 @@ object UserDataStore {
 
     val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user")
 
-     val ACCESS_TOKEN_KEY = stringPreferencesKey("ACCESS_TOKEN")
-     val USER_ID_KEY = stringPreferencesKey("USER_ID")
-     val USER_NAME_KEY = stringPreferencesKey("USER_NAME")
-     val SCHOOL_ID_KEY = stringPreferencesKey("SCHOOL_ID")
-     val SCHOOL_NAME_KEY = stringPreferencesKey("SCHOOL_NAME")
-     val SCHOOL_SHORT_NAME_KEY = stringPreferencesKey("SCHOOL_SHORT_NAME")
-     val SCHOOL_CODE_KEY = stringPreferencesKey("SCHOOL_CODE")
+    val USERNAME_KEY = stringPreferencesKey("USER_NAME")
+    val PASSWORD_KEY = stringPreferencesKey("PASSWORD")
+    val ACCESS_TOKEN_KEY = stringPreferencesKey("ACCESS_TOKEN")
+    val USER_ID_KEY = stringPreferencesKey("USER_ID")
+    val USER_NAME_KEY = stringPreferencesKey("USER_NAME")
+    val SCHOOL_ID_KEY = stringPreferencesKey("SCHOOL_ID")
+    val SCHOOL_NAME_KEY = stringPreferencesKey("SCHOOL_NAME")
+    val SCHOOL_SHORT_NAME_KEY = stringPreferencesKey("SCHOOL_SHORT_NAME")
+    val SCHOOL_CODE_KEY = stringPreferencesKey("SCHOOL_CODE")
 
 
-     val userIdFlow: Flow<String?> = StarGraderApplication.context.dataStore.data.map {
+    val userIdFlow: Flow<String?> = StarGraderApplication.context.dataStore.data.map {
         it[USER_NAME_KEY]
     }
 
@@ -41,7 +43,7 @@ object UserDataStore {
     }
 
 
-     suspend fun storeUser(data: LoggedInUser) {
+    suspend fun storeUser(data: LoggedInUser) {
         StarGraderApplication.context.dataStore.edit { user ->
             user[ACCESS_TOKEN_KEY] = data.accessToken
             user[USER_ID_KEY] = data.userId
@@ -55,7 +57,7 @@ object UserDataStore {
     }
 
 
-     suspend fun clearUser() {
+    suspend fun clearUser() {
         StarGraderApplication.context.dataStore.edit { user ->
             user.remove(ACCESS_TOKEN_KEY)
             user.remove(USER_ID_KEY)

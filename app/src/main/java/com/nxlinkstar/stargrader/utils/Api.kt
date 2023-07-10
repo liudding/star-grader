@@ -2,13 +2,19 @@ package com.nxlinkstar.stargrader.utils
 
 import com.nxlinkstar.stargrader.StarGraderApplication
 import com.nxlinkstar.stargrader.data.UserDataStore.ACCESS_TOKEN_KEY
+import com.nxlinkstar.stargrader.data.UserDataStore.PASSWORD_KEY
 import com.nxlinkstar.stargrader.data.UserDataStore.SCHOOL_ID_KEY
+import com.nxlinkstar.stargrader.data.UserDataStore.USERNAME_KEY
 import com.nxlinkstar.stargrader.data.UserDataStore.dataStore
 import com.nxlinkstar.stargrader.data.model.LoggedInUser
+import com.nxlinkstar.stargrader.data.model.ScanResult
 import com.nxlinkstar.stargrader.data.model.ScanTemplate
 import com.nxlinkstar.stargrader.data.model.Textbook
 import com.nxlinkstar.stargrader.data.model.Workbook
 import kotlinx.coroutines.flow.first
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
+import okhttp3.Request
 
 object Api {
 
@@ -61,21 +67,25 @@ object Api {
     }
 
 
-    suspend fun analyze(workbook: String): ScanTemplate? {
+    suspend fun analyze(workbook: String): ScanResult? {
         val ds = StarGraderApplication.context.dataStore.data.first()
-        val accessToken = ds[ACCESS_TOKEN_KEY]
-        val url = "https://edu-rec.internal.purvar.com/api/analysispage"
+        val username = ds[USERNAME_KEY]
+        val password = ds[PASSWORD_KEY]
+        val url = "https://edu-rec.internal.purvar.com:7443/api/analysispage"
 
-        return HttpUtils.post(url, Utils.toMap(
+
+         return HttpUtils.postWithFile(url, Utils.toMap(
             "isDebug", "1",
-            "UserName", "",
-            "PassWord", "",
+            "UserName", username!!,
+            "PassWord", password!!,
             "RoleType", "ROLE_TYPE_001",
             "ip", "",
             "LoginUrl", "https://ps.edu.purvar.com/cjn-sso/api/v3/sso/security/getAccessToken",
             "GetTemplateInfoUrl", "http://172.29.231.77/cjn-ws/api/v3/ws/answercard/getAnswerPaperInfo",
             "GetTemplateByTngCaseUuidInfoUrl", "https://ps.edu.purvar.com/cjn-ws/api/v3/ws/answercard/getAnswercardInfoByTngCaseUuid",
             "TngcaseUuid", workbook  // 练案ID
-        ), ScanTemplate::class.java)
+        ), null, ScanResult::class.java)?.result
+
+
     }
 }

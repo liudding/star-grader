@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.datastore.dataStore
 import com.nxlinkstar.stargrader.StarGraderApplication
 import com.nxlinkstar.stargrader.data.UserDataStore.ACCESS_TOKEN_KEY
+import com.nxlinkstar.stargrader.data.UserDataStore.PASSWORD_KEY
 import com.nxlinkstar.stargrader.data.UserDataStore.SCHOOL_CODE_KEY
 import com.nxlinkstar.stargrader.data.UserDataStore.SCHOOL_ID_KEY
 import com.nxlinkstar.stargrader.data.UserDataStore.SCHOOL_NAME_KEY
@@ -68,6 +69,8 @@ class LoginRepository() {
 
             Log.d("REPO", "user: " + store[USER_ID_KEY] + " " + store[ACCESS_TOKEN_KEY])
             user = LoggedInUser(
+                store[USER_NAME_KEY]!!,
+                store[PASSWORD_KEY]!!,
                 store[ACCESS_TOKEN_KEY]!!,
                 store[USER_ID_KEY]!!,
                 store[USER_NAME_KEY]!!,
@@ -112,6 +115,8 @@ class LoginRepository() {
 
 
         val user = LoggedInUser(
+            username,
+            password,
             json.getString("accessToken"),
             data.getString("userUuid"),
             data.getString("fullName"),

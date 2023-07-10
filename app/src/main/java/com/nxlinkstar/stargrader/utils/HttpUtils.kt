@@ -12,6 +12,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.*
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import java.net.URL
@@ -142,6 +143,47 @@ object HttpUtils {
         }
         val size = urlConnection.contentLength
         return size.toLong()
+    }
+
+     suspend fun <T> postWithFile( url: String,
+                                       params: Map<String, String>,
+                                       file: File,
+                                      clazz: Class<T>): CacheResult<T>? = withContext(Dispatchers.IO) {
+        val requestBody = MultipartBody.Builder()
+            .setType(MultipartBody.FORM)
+            .addFormDataPart("image", "logo-square.png", file.asRequestBody("image/png".toMediaType()))
+
+
+        for ((k,v) in params) {
+            requestBody.addFormDataPart(k, v)
+        }
+
+        var str:String? = null
+        var result: T? = null
+        var isCache = false
+
+        try {
+            val request = Request.Builder()
+                .url(url)
+                .post(requestBody.build())
+                .build()
+
+            val response = client.newCall(request).execute()
+            str = response.body?.string()
+            if (response.code != 200) {
+                Log.d(TAG, "post $url , params:${params}, response:$str")
+            }
+            result = gson.fromJson(str, clazz)
+            isCache = response.networkResponse == null
+        } catch (e:JsonSyntaxException) {
+            Log.w(TAG, "json parse failed, $e")
+        } catch (e: Exception) {
+            Log.w(TAG, "post failed:${e} ,url:$url")
+            e.printStackTrace()
+        }
+
+//        Log.d(TAG, "post $url cost: ${System.currentTimeMillis() - time} ms, isCache:$isCache")
+        return@withContext if (result != null) CacheResult(result, isCache) else null
     }
 
     private suspend fun <T> postWithCache(
