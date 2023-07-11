@@ -93,4 +93,8 @@ class ScannerViewModel : ViewModel() {
         _workbook.value = b
     }
 
+    fun addNewScan(student: String) {
+        _scannedList.value = listOf(student) + _scannedList.value!!
+    }
+
 }
