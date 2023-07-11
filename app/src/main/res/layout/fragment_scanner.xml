@@ -16,11 +16,15 @@
         <include android:id="@+id/scan_target" layout="@layout/scan_target" />
 
         <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/scanned_list"
             android:layout_height="0dp"
             android:layout_width="match_parent"
             android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@+id/sidebar_header"
-            app:layout_constraintBottom_toBottomOf="parent">
+            app:layout_constraintTop_toBottomOf="@+id/scan_target"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            tools:context=".ui.scanner.ScannerFragment"
+            tools:listitem="@layout/fragment_scanner_scanned_list_item">
 
         </androidx.recyclerview.widget.RecyclerView>
 

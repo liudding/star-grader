@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.first
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.Request
+import java.io.File
 
 object Api {
 
@@ -67,7 +68,7 @@ object Api {
     }
 
 
-    suspend fun analyze(workbook: String): ScanResult? {
+    suspend fun analyze(workbook: String, file: File): ScanResult? {
         val ds = StarGraderApplication.context.dataStore.data.first()
         val username = ds[USERNAME_KEY]
         val password = ds[PASSWORD_KEY]
@@ -84,7 +85,7 @@ object Api {
             "GetTemplateInfoUrl", "http://172.29.231.77/cjn-ws/api/v3/ws/answercard/getAnswerPaperInfo",
             "GetTemplateByTngCaseUuidInfoUrl", "https://ps.edu.purvar.com/cjn-ws/api/v3/ws/answercard/getAnswercardInfoByTngCaseUuid",
             "TngcaseUuid", workbook  // 练案ID
-        ), null, ScanResult::class.java)?.result
+        ), file, ScanResult::class.java)?.result
 
 
     }

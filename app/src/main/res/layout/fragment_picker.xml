@@ -40,7 +40,7 @@
         android:clipToPadding="false"
         android:paddingTop="@dimen/list_item_spacing_half"
         android:paddingBottom="@dimen/list_item_spacing_half"
-        tools:context=".ui.scanner.ScannerFragment"
+        tools:context=".ui.scanner.PickerFragment"
         tools:listitem="@layout/fragment_picker_item">
 
     </androidx.recyclerview.widget.RecyclerView>

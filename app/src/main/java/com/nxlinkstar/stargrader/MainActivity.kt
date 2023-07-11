@@ -10,9 +10,13 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.lifecycle.Observer
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.nxlinkstar.stargrader.StarGraderApplication.Companion.context
+import com.nxlinkstar.stargrader.data.LoginRepository
+import com.nxlinkstar.stargrader.data.UserDataStore
 import com.nxlinkstar.stargrader.data.UserDataStore.dataStore
 import com.nxlinkstar.stargrader.databinding.ActivityMainBinding
 import kotlinx.coroutines.flow.first
@@ -40,11 +44,17 @@ class MainActivity : AppCompatActivity() {
             // You should also handle IOExceptions here.
         }
 
-//        navController.addOnDestinationChangedListener { _, destination, _ ->
-//            if (destination.id == R.id.LoginFragment) {
-////                binding.toolbar.navigationIcon = null
-//            }
-//        }
+        UserDataStore.accessTokenFlow.asLiveData().observe(this, Observer {
+            if (it == null) {
+                navController.navigate(R.id.LoginFragment)
+            }
+        })
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            if (destination.id == R.id.LoginFragment) {
+                binding.toolbar.navigationIcon = null
+            }
+        }
 
 
 //        binding.fab.setOnClickListener { view ->
@@ -66,6 +76,14 @@ class MainActivity : AppCompatActivity() {
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
             R.id.action_settings -> true
+            R.id.action_logout -> {
+                lifecycleScope.launch {
+                    val loginRepository = LoginRepository()
+                    loginRepository.logout()
+                }
+
+                return true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }

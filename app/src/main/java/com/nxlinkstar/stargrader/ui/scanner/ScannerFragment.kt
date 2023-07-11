@@ -13,6 +13,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.activityViewModels
@@ -21,12 +22,16 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.sidesheet.SideSheetDialog
 import com.nxlinkstar.stargrader.ItemListDialogFragment
 import com.nxlinkstar.stargrader.R
 import com.nxlinkstar.stargrader.data.SUBJECTS
 import com.nxlinkstar.stargrader.databinding.FragmentHomeBinding
 import com.nxlinkstar.stargrader.databinding.FragmentScannerBinding
+import com.nxlinkstar.stargrader.databinding.FragmentScannerScannedListItemBinding
 import com.nxlinkstar.stargrader.databinding.ScanTargetBinding
 import com.nxlinkstar.stargrader.ui.login.LoginViewModel
 import com.nxlinkstar.stargrader.ui.login.LoginViewModelFactory
@@ -49,11 +54,10 @@ class ScannerFragment : Fragment() {
     private var _binding: FragmentScannerBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var scanTargetBinding: ScanTargetBinding
 
     private lateinit var sideSheetDialog: SideSheetDialog
 
-    private  var mUSBMonitor: USBMonitor? = null
+    private var mUSBMonitor: USBMonitor? = null
 
     // TODO: get resolution size from settings
     private var width = 640
@@ -115,7 +119,7 @@ class ScannerFragment : Fragment() {
     }
 
     private fun getBitmap(frame: ByteArray?): Bitmap {
-       return YuvUtils.nv21ToBitmap(frame, width, height)
+        return YuvUtils.nv21ToBitmap(frame, width, height)
     }
 
 
@@ -129,12 +133,20 @@ class ScannerFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentScannerBinding.inflate(inflater, container, false)
 
 
         sideSheetDialog = SideSheetDialog(requireContext());
         sideSheetDialog.setContentView(R.layout.scanner_side_sheet)
+
+
+        val recyclerView = binding.scannedList
+        val adapter =  ScannedItemAdapter()
+        recyclerView.adapter =  adapter
+        viewModel.scannedList.observe(viewLifecycleOwner) {
+            adapter.submitList(it)
+        }
 
         return binding.root
     }
@@ -147,25 +159,25 @@ class ScannerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.subjectState.observe(viewLifecycleOwner, Observer{
+        viewModel.subjectState.observe(viewLifecycleOwner, Observer {
             binding.scanTarget.subject.text = it?.label ?: ""
         })
-        viewModel.textbookState.observe(viewLifecycleOwner, Observer{
+        viewModel.textbookState.observe(viewLifecycleOwner, Observer {
             binding.scanTarget.textbook.text = it?.name ?: ""
         })
-        viewModel.workbookState.observe(viewLifecycleOwner, Observer{
+        viewModel.workbookState.observe(viewLifecycleOwner, Observer {
             binding.scanTarget.workbook.text = it?.name ?: ""
         })
 
 
 
-        binding.scanTarget.cellSubject.setOnClickListener{
+        binding.scanTarget.cellSubject.setOnClickListener {
             val list = viewModel.subjects.map {
                 PickerFragment.Item(it.label, it.code)
             }
 
             val dialog = PickerFragment.newInstance(list, "选择科目")
-            dialog.setOnItemSelectedListener(object: PickerFragment.OnItemSelectedListener {
+            dialog.setOnItemSelectedListener(object : PickerFragment.OnItemSelectedListener {
                 override fun onItemSelectedListener(position: Int) {
                     val item = list[position]
                     viewModel.subjectChanged(item.value)
@@ -175,9 +187,9 @@ class ScannerFragment : Fragment() {
             fragmentManager?.let { it1 -> dialog.show(it1, "SUBJECT_DIALOG") }
         }
 
-        binding.scanTarget.cellTextbook.setOnClickListener{
+        binding.scanTarget.cellTextbook.setOnClickListener {
             if (viewModel.textbooksState.value == null) {
-              return@setOnClickListener
+                return@setOnClickListener
             }
 
             val list = viewModel.textbooksState.value!!.map {
@@ -185,7 +197,7 @@ class ScannerFragment : Fragment() {
             }
 
             val dialog = PickerFragment.newInstance(list, "选择教材")
-            dialog.setOnItemSelectedListener(object: PickerFragment.OnItemSelectedListener {
+            dialog.setOnItemSelectedListener(object : PickerFragment.OnItemSelectedListener {
                 override fun onItemSelectedListener(position: Int) {
                     val item = list[position]
                     viewModel.textbookChanged(item.value)
@@ -195,7 +207,7 @@ class ScannerFragment : Fragment() {
             fragmentManager?.let { it1 -> dialog.show(it1, "TEXTBOOK_DIALOG") }
         }
 
-        binding.scanTarget.cellWorkbook.setOnClickListener{
+        binding.scanTarget.cellWorkbook.setOnClickListener {
             if (viewModel.workbooksState.value == null) {
                 return@setOnClickListener
             }
@@ -205,7 +217,7 @@ class ScannerFragment : Fragment() {
             }
 
             val dialog = PickerFragment.newInstance(list, "选择练习册")
-            dialog.setOnItemSelectedListener(object: PickerFragment.OnItemSelectedListener {
+            dialog.setOnItemSelectedListener(object : PickerFragment.OnItemSelectedListener {
                 override fun onItemSelectedListener(position: Int) {
                     val item = list[position]
                     viewModel.workbookChanged(item.value)
@@ -214,7 +226,6 @@ class ScannerFragment : Fragment() {
             })
             fragmentManager?.let { it1 -> dialog.show(it1, "WORKBOOK_DIALOG") }
         }
-
 
 
 //        binding.chan.setOnClickListener {
@@ -297,6 +308,32 @@ class ScannerFragment : Fragment() {
 //        LogUtils.d(TAG, "onStop")
 //        UVCCameraUtil.releaseRGBCamera()
 //        mUSBMonitor.unregister()
+    }
+
+    class ScannedItemAdapter :
+        ListAdapter<String, ScannedItemViewHolder>(object : DiffUtil.ItemCallback<String>() {
+
+            override fun areItemsTheSame(oldItem: String, newItem: String): Boolean =
+                oldItem == newItem
+
+            override fun areContentsTheSame(oldItem: String, newItem: String): Boolean =
+                oldItem == newItem
+        }) {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ScannedItemViewHolder {
+            val binding = FragmentScannerScannedListItemBinding.inflate(LayoutInflater.from(parent.context))
+            return ScannedItemViewHolder(binding)
+        }
+
+        override fun onBindViewHolder(holder: ScannedItemViewHolder, position: Int) {
+            holder.textview.text = getItem(position)
+        }
+
+    }
+
+    class ScannedItemViewHolder(binding: FragmentScannerScannedListItemBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+            val textview = binding.textview
     }
 
 

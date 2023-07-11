@@ -33,18 +33,36 @@ object UserDataStore {
         it[USER_NAME_KEY]
     }
 
+    val accessTokenFlow: Flow<String?> = StarGraderApplication.context.dataStore.data.map {
+        it[ACCESS_TOKEN_KEY]
+    }
 
-    fun getUser() {
-        GlobalScope.launch {
-            val store = StarGraderApplication.context.dataStore.data.first()
-            // You should also handle IOExceptions here.
 
-        }
+
+    suspend fun getUser(): LoggedInUser? {
+        val store = StarGraderApplication.context.dataStore.data.first()
+
+        if (store[USER_ID_KEY] == null) return null
+
+        return LoggedInUser(
+                store[USERNAME_KEY]!!,
+                store[PASSWORD_KEY]!!,
+                store[ACCESS_TOKEN_KEY]!!,
+                store[USER_ID_KEY]!!,
+                store[USER_NAME_KEY]!!,
+                store[SCHOOL_ID_KEY]!!,
+                store[SCHOOL_CODE_KEY]!!,
+                store[SCHOOL_NAME_KEY]!!,
+                store[SCHOOL_SHORT_NAME_KEY]!!
+            )
     }
 
 
     suspend fun storeUser(data: LoggedInUser) {
         StarGraderApplication.context.dataStore.edit { user ->
+            user[USERNAME_KEY] = data.username
+            user[PASSWORD_KEY] = data.password
+
             user[ACCESS_TOKEN_KEY] = data.accessToken
             user[USER_ID_KEY] = data.userId
             user[USER_NAME_KEY] = data.name
@@ -59,6 +77,9 @@ object UserDataStore {
 
     suspend fun clearUser() {
         StarGraderApplication.context.dataStore.edit { user ->
+            user.remove(USERNAME_KEY)
+            user.remove(PASSWORD_KEY)
+
             user.remove(ACCESS_TOKEN_KEY)
             user.remove(USER_ID_KEY)
             user.remove(USER_NAME_KEY)

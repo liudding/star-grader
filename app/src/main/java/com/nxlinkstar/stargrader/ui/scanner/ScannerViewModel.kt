@@ -35,6 +35,15 @@ class ScannerViewModel : ViewModel() {
     val workbookState: LiveData<Workbook?> = _workbook
 
 
+    private val _scannedList = MutableLiveData<List<String>>().apply {
+        value = (1..16).mapIndexed { _, i ->
+            "This is item # $i"
+        }
+    }
+
+    val scannedList: LiveData<List<String>> = _scannedList
+
+
     @OptIn(DelicateCoroutinesApi::class)
     fun getTextbooks(subject: String) {
         GlobalScope.launch {

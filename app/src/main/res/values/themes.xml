@@ -13,8 +13,8 @@
 <!--        <item name="colorSecondaryVariant">@color/teal_700</item>-->
         <item name="colorOnSecondary">@color/white</item>
 
-        <item name="android:itemBackground">@color/primary</item>
-        <item name="android:textColor">@color/white</item>
+<!--        <item name="android:itemBackground">@color/primary</item>-->
+<!--        <item name="android:textColor">@color/white</item>-->
 
 
 <!--        <item name="rippleColor">@color/colorAccent</item>-->

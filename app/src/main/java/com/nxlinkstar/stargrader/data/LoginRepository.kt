@@ -9,6 +9,7 @@ import com.nxlinkstar.stargrader.data.UserDataStore.SCHOOL_CODE_KEY
 import com.nxlinkstar.stargrader.data.UserDataStore.SCHOOL_ID_KEY
 import com.nxlinkstar.stargrader.data.UserDataStore.SCHOOL_NAME_KEY
 import com.nxlinkstar.stargrader.data.UserDataStore.SCHOOL_SHORT_NAME_KEY
+import com.nxlinkstar.stargrader.data.UserDataStore.USERNAME_KEY
 import com.nxlinkstar.stargrader.data.UserDataStore.USER_ID_KEY
 import com.nxlinkstar.stargrader.data.UserDataStore.USER_NAME_KEY
 import com.nxlinkstar.stargrader.data.UserDataStore.clearUser
@@ -35,19 +36,6 @@ import java.io.IOException
 class LoginRepository() {
 
 
-    private val dataSource: LoginDataSource = LoginDataSource()
-
-    companion object {
-
-
-        lateinit var instance: LoginRepository
-
-        fun getRepo(): LoginRepository {
-            return instance
-        }
-    }
-
-
     // in-memory cache of the loggedInUser object
     var user: LoggedInUser? = null
         private set
@@ -56,7 +44,6 @@ class LoginRepository() {
         get() = user != null
 
     init {
-        instance = this
         // If user credentials will be cached in local storage, it is recommended it be encrypted
         // @see https://developer.android.com/training/articles/keystore
         user = null
@@ -68,31 +55,27 @@ class LoginRepository() {
             }
 
             Log.d("REPO", "user: " + store[USER_ID_KEY] + " " + store[ACCESS_TOKEN_KEY])
-            user = LoggedInUser(
-                store[USER_NAME_KEY]!!,
-                store[PASSWORD_KEY]!!,
-                store[ACCESS_TOKEN_KEY]!!,
-                store[USER_ID_KEY]!!,
-                store[USER_NAME_KEY]!!,
-                store[SCHOOL_ID_KEY]!!,
-                store[SCHOOL_CODE_KEY]!!,
-                store[SCHOOL_NAME_KEY]!!,
-                store[SCHOOL_SHORT_NAME_KEY]!!
-            )
+//            user = LoggedInUser(
+//                store[USERNAME_KEY]!!,
+//                store[PASSWORD_KEY]!!,
+//                store[ACCESS_TOKEN_KEY]!!,
+//                store[USER_ID_KEY]!!,
+//                store[USER_NAME_KEY]!!,
+//                store[SCHOOL_ID_KEY]!!,
+//                store[SCHOOL_CODE_KEY]!!,
+//                store[SCHOOL_NAME_KEY]!!,
+//                store[SCHOOL_SHORT_NAME_KEY]!!
+//            )
         }
     }
 
     suspend fun logout() {
         user = null
-        dataSource.logout()
 
         clearUser()
     }
 
     suspend fun login(username: String, password: String): Result<LoggedInUser> {
-        // handle login
-//        val result = dataSource.login(username, password)
-
 
         val result = Api.login(username, password)
 
@@ -147,7 +130,6 @@ class LoginRepository() {
 
 
         storeUser(loggedInUser)
-
     }
 
 

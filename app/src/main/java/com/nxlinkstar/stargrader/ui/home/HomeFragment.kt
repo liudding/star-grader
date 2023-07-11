@@ -9,15 +9,20 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.nxlinkstar.stargrader.R
 import com.nxlinkstar.stargrader.data.LoginDataSource
 import com.nxlinkstar.stargrader.data.LoginRepository
+import com.nxlinkstar.stargrader.data.UserDataStore
 import com.nxlinkstar.stargrader.databinding.FragmentHomeBinding
 import com.nxlinkstar.stargrader.ui.login.LoginFragment
 import com.nxlinkstar.stargrader.ui.login.LoginViewModel
 import com.nxlinkstar.stargrader.ui.login.LoginViewModelFactory
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class HomeFragment : Fragment() {
 
@@ -39,14 +44,14 @@ class HomeFragment : Fragment() {
 
         val navController = findNavController()
 
-        val currentBackStackEntry = navController.currentBackStackEntry!!
-        val savedStateHandle = currentBackStackEntry.savedStateHandle
-        savedStateHandle.getLiveData<Boolean>(LoginFragment.LOGIN_SUCCESSFUL)
-            .observe(currentBackStackEntry, Observer { success ->
-                if (success) {
-                    binding.username.text = "nihao"
-                }
-            })
+//        val currentBackStackEntry = navController.currentBackStackEntry!!
+//        val savedStateHandle = currentBackStackEntry.savedStateHandle
+//        savedStateHandle.getLiveData<Boolean>(LoginFragment.LOGIN_SUCCESSFUL)
+//            .observe(currentBackStackEntry, Observer { success ->
+//                if (success) {
+//                    binding.username.text = "nihao"
+//                }
+//            })
     }
 
 
@@ -71,6 +76,24 @@ class HomeFragment : Fragment() {
         binding.buttonToScanner.setOnClickListener {
             findNavController().navigate(R.id.action_HomeFragment_to_ScannerFragment)
         }
+
+        binding.username.text = "nihao"
+
+//        GlobalScope.launch {
+//            val user = UserDataStore.getUser()
+//            if (user != null) {
+//                binding.username.text = user.name
+//            }
+//        }
+
+//        lifecycleScope.launch {
+//            val user = UserDataStore.getUser()
+//            if (user != null) {
+//                binding.username.text = user.name
+//            }
+//        }
+
+
     }
 
 
@@ -81,25 +104,15 @@ class HomeFragment : Fragment() {
 
         Log.d("Home", "onActivityCreated")
 
-        if (!loginRepository.isLoggedIn) {
-            Log.d("Home", "nav to login")
-            val navController = findNavController()
-            navController.navigate(R.id.LoginFragment)
-        }
-
 
 //        loginViewModel.loginResult.observe(viewLifecycleOwner, Observer { result ->
 //            result ?: return@Observer
 //
 //            result.success?.let {
-////                updateUiWithUser(it)
+//                Log.d("Home", "login success")
+//                binding.username.text = result.success.displayName
 //            }
 //
-//            if (result != null) {
-////                showWelcomeMessage()
-//            } else {
-////
-//            }
 //        })
     }
 

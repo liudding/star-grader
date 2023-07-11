@@ -84,6 +84,8 @@ class LoginDataSource {
 
 
             val user = LoggedInUser(
+                username,
+                password,
                 json.getString("accessToken"),
                 data.getString("userUuid"),
                 data.getString("fullName"),
