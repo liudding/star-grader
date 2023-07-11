@@ -9,42 +9,51 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/sidebar"
         android:layout_width="200dp"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        >
+        app:layout_constraintTop_toTopOf="parent">
 
-        <include android:id="@+id/scan_target" layout="@layout/scan_target" />
+        <include
+            android:id="@+id/scan_target"
+            layout="@layout/scan_target"
+            app:layout_constraintStart_toStartOf="@+id/scanned_stats"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <LinearLayout
             android:id="@+id/scanned_stats"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:padding="8dp"
-            android:orientation="horizontal"
-            app:layout_constraintTop_toBottomOf="@+id/scan_target"
             android:background="@color/lightgray"
-            >
+            android:orientation="horizontal"
+            android:padding="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/scan_target">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="已扫描："
+                android:textSize="10sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="10sp"
-                android:text="已扫描："/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="10sp"
-                tools:text="23"/>
+                tools:text="23" />
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/scanned_list"
+            android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_width="match_parent"
             android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@+id/scanned_stats"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/scanned_stats"
             tools:context=".ui.scanner.ScannerFragment"
             tools:listitem="@layout/fragment_scanner_scanned_list_item">
 
@@ -53,11 +62,11 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <FrameLayout
-        android:layout_height="match_parent"
         android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:background="@color/black"
         app:layout_constraintLeft_toRightOf="@id/sidebar"
-        app:layout_constraintRight_toRightOf="parent"
-        android:background="@color/black">
+        app:layout_constraintRight_toRightOf="parent">
 
         <TextureView
             android:id="@+id/camera_view"
