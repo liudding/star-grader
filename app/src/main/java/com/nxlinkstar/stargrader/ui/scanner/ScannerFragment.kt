@@ -1,14 +1,22 @@
 package com.nxlinkstar.stargrader.ui.scanner
 
+import android.app.PendingIntent
+import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.hardware.usb.UsbDevice
 import android.os.Bundle
+import android.os.Environment
+import android.text.TextUtils
+import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -20,17 +28,30 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.sidesheet.SideSheetDialog
+import com.jiangdg.ausbc.MultiCameraClient
+import com.jiangdg.ausbc.base.CameraFragment
+import com.jiangdg.ausbc.callback.ICameraStateCallBack
+import com.jiangdg.ausbc.callback.ICaptureCallBack
+import com.jiangdg.ausbc.callback.IPreviewDataCallBack
+import com.jiangdg.ausbc.utils.ToastUtils
+import com.jiangdg.ausbc.widget.AspectRatioTextureView
+import com.jiangdg.ausbc.widget.CaptureMediaView
+import com.jiangdg.ausbc.widget.IAspectRatio
 import com.nxlinkstar.stargrader.R
 import com.nxlinkstar.stargrader.databinding.FragmentScannerBinding
 import com.nxlinkstar.stargrader.databinding.FragmentScannerScannedListItemBinding
 import com.nxlinkstar.stargrader.utils.ImageFileUtil
 import com.nxlinkstar.stargrader.utils.YuvUtils
-import com.serenegiant.usb.USBMonitor
-import com.serenegiant.usb.UVCCameraUtil
+//import com.serenegiant.usb.IFrameCallback
+//import com.serenegiant.usb.USBMonitor
+//import com.serenegiant.usb.UVCCameraUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.BufferedWriter
+import java.io.File
+import java.io.FileOutputStream
 
-class ScannerFragment : Fragment() {
+class ScannerFragment : CameraFragment(), CaptureMediaView.OnViewClickListener {
 
     companion object {
         fun newInstance() = ScannerFragment()
@@ -44,7 +65,7 @@ class ScannerFragment : Fragment() {
 
     private lateinit var sideSheetDialog: SideSheetDialog
 
-    private var mUSBMonitor: USBMonitor? = null
+//    private var mUSBMonitor: USBMonitor? = null
 
     // TODO: get resolution size from settings
     private var width = 640
@@ -54,39 +75,62 @@ class ScannerFragment : Fragment() {
     private var isSave = false
 
     private fun intiCamera() {
-        mUSBMonitor =
-            UVCCameraUtil.initUSBMonitor(
-                requireActivity(),
-                object : UVCCameraUtil.OnMyDevConnectListener {
-                    override fun onConnectDev(
-                        device: UsbDevice,
-                        ctrlBlock: USBMonitor.UsbControlBlock
-                    ) {
-                        val pid = String.format("%x", device.productId)
-//                        LogUtils.d("pid", "connect: $pid")
-                        openRgb(pid, ctrlBlock)
-//                        isOpen()
-
-                    }
-
-                })
+//        mUSBMonitor =
+//            UVCCameraUtil.initUSBMonitor(
+//                requireActivity(),
+//                object : UVCCameraUtil.OnMyDevConnectListener {
+//                    override fun onConnectDev(
+//                        device: UsbDevice,
+//                        ctrlBlock: USBMonitor.UsbControlBlock
+//                    ) {
+//                        val pid = String.format("%x", device.productId)
+//                        Toast.makeText(requireContext(), "Connected: $pid", Toast.LENGTH_SHORT).show()
+////                        LogUtils.d("pid", "connect: $pid")
+////                        openRgb(pid, ctrlBlock)
+//                        openHeightCamera(pid, ctrlBlock)
+////                        isOpen()
+//
+//
+//
+//                    }
+//
+//                })
     }
 
-    private fun openRgb(pid: String, ctrlBlock: USBMonitor.UsbControlBlock) {
-        UVCCameraUtil.openRGBCamera(
-            pid,
-            4,
-            width,
-            height,
-            binding.cameraView,
-            ctrlBlock,
-            object : UVCCameraUtil.FrameDataCallBack {
-                override fun onFrame(data: ByteArray) {
-//                    isLook(data)
-                    saveBitmap(data)
-                }
-            })
-    }
+//    private fun openHeightCamera(
+//        pid: String,
+//        ctrlBlock: USBMonitor.UsbControlBlock
+//    ) {
+//        UVCCameraUtil.openHeightCamera(
+//            pid,
+//            4,
+//            width,
+//            height,
+//            binding.cameraView,
+//            ctrlBlock,
+//            IFrameCallback {
+//
+//            }
+//        )
+//
+//    }
+
+
+//    private fun openRgb(pid: String, ctrlBlock: USBMonitor.UsbControlBlock) {
+//        UVCCameraUtil.openRGBCamera(
+//            pid,
+//            4,
+//            width,
+//            height,
+//            binding.cameraView,
+//            ctrlBlock,
+//            object : UVCCameraUtil.FrameDataCallBack {
+//                override fun onFrame(data: ByteArray) {
+////                    isLook(data)
+//                    saveBitmap(data)
+//                }
+//            })
+//    }
 
     private fun saveBitmap(frame: ByteArray?) {
         if (isSave) {
@@ -138,10 +182,88 @@ class ScannerFragment : Fragment() {
         return binding.root
     }
 
+    override fun getCameraView(): IAspectRatio? {
+        return AspectRatioTextureView(requireContext())
+    }
+
+    override fun getCameraViewContainer(): ViewGroup? {
+        return _binding?.cameraViewContainer
+    }
+
+    override fun getRootView(inflater: LayoutInflater, container: ViewGroup?): View? {
+        if (_binding == null) {
+            _binding = FragmentScannerBinding.inflate(inflater, container, false)
+        }
+        return _binding?.root
+    }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         // TODO: Use the ViewModel
     }
+
+    override fun onCameraState(self: MultiCameraClient.ICamera,
+                               code: ICameraStateCallBack.State,
+                               msg: String?) {
+        ToastUtils.show("onCameraState: $code")
+        when (code) {
+            ICameraStateCallBack.State.OPENED -> handleCameraOpened()
+            ICameraStateCallBack.State.CLOSED -> handleCameraClosed()
+            ICameraStateCallBack.State.ERROR -> handleCameraError(null)
+        }
+    }
+
+    private fun handleCameraError(msg: String?) {
+//        mViewBinding.uvcLogoIv.visibility = View.VISIBLE
+//        mViewBinding.frameRateTv.visibility = View.GONE
+        ToastUtils.show("camera opened error: $msg")
+    }
+
+    private fun handleCameraClosed() {
+//        mViewBinding.uvcLogoIv.visibility = View.VISIBLE
+//        mViewBinding.frameRateTv.visibility = View.GONE
+        ToastUtils.show("camera closed success")
+    }
+
+    private fun handleCameraOpened() {
+//        binding.uvcLogoIv.visibility = View.GONE
+//        binding.frameRateTv.visibility = View.VISIBLE
+//        binding.brightnessSb.max = (getCurrentCamera() as? CameraUVC)?.getBrightnessMax() ?: 100
+//        binding.brightnessSb.progress = (getCurrentCamera() as? CameraUVC)?.getBrightness() ?: 0
+//        Logger.i(TAG, "max = ${mViewBinding.brightnessSb.max}, progress = ${mViewBinding.brightnessSb.progress}")
+//        binding.brightnessSb.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+//            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
+//                (getCurrentCamera() as? CameraUVC)?.setBrightness(progress)
+//            }
+//
+//            override fun onStartTrackingTouch(seekBar: SeekBar?) {
+//
+//            }
+//
+//            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+//
+//            }
+//        })
+//        ToastUtils.show("camera opened success")
+
+        getCurrentCamera()?.addPreviewDataCallBack( object : IPreviewDataCallBack {
+            override fun onPreviewData(
+                data: ByteArray?,
+                width: Int,
+                height: Int,
+                format: IPreviewDataCallBack.DataFormat
+            ) {
+                Log.i("scanner", "onPreviewData")
+//                ToastUtils.show("onPreviewData: $width, $height, " + data?.size )
+            }
+        })
+
+
+
+    }
+
+    override fun getGravity(): Int = Gravity.TOP
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -172,6 +294,26 @@ class ScannerFragment : Fragment() {
 
             })
             fragmentManager?.let { it1 -> dialog.show(it1, "SUBJECT_DIALOG") }
+
+
+            val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath + File.separator + "test.png";
+            captureImage(object : ICaptureCallBack {
+                override fun onBegin() {
+
+                }
+
+                override fun onError(error: String?) {
+                    ToastUtils.show(error ?: "未知异常")
+                }
+
+                override fun onComplete(path: String?) {
+                    path?.let { ToastUtils.show(it) }
+                }
+            }, path)
+
+            val allPreviewSizes = getAllPreviewSizes()
+
+            writeTextToDcimDirectory("sizes",  allPreviewSizes.toString())
         }
 
         binding.scanTarget.cellTextbook.setOnClickListener {
@@ -215,6 +357,7 @@ class ScannerFragment : Fragment() {
         }
 
 
+
 //        binding.chan.setOnClickListener {
 //            findNavController().navigate(R.id.action_HomeFragment_to_ScannerFragment)
 //        }
@@ -232,8 +375,26 @@ class ScannerFragment : Fragment() {
 //
 //        )
 
-//        intiCamera()
+        intiCamera()
 
+    }
+
+    fun writeTextToDcimDirectory(fileName: String, content: String) {
+        val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).absolutePath;
+
+//        val dcimDir = File(path, "MyApp")
+
+        val txt = File(path, "$fileName.txt")
+
+        try {
+            FileOutputStream(txt).use { fileOutputStream ->
+                BufferedWriter(fileOutputStream.writer()).use { bufferedWriter ->
+                    bufferedWriter.write(content)
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
 //    @Suppress("DEPRECATION")
@@ -286,15 +447,24 @@ class ScannerFragment : Fragment() {
     override fun onStart() {
         super.onStart()
 
-//        mUSBMonitor.register()
-//        UVCCameraUtil.requestRGBCameraPermission(requireActivity(), 300, mUSBMonitor!!)
+//        filter.addAction("android.hardware.usb.action.USB_DEVICE_ATTACHED")
+
+//        mUSBMonitor?.register()
+////        UVCCameraUtil.requestRGBCameraPermission(requireActivity(), 300, mUSBMonitor!!)
+//
+//        val requestId = UVCCameraUtil.requestHeightCameraPermission(requireActivity(), 300, mUSBMonitor!!)
+//        if (TextUtils.isEmpty(requestId)) {
+//            val hint = "高拍仪没有找到或高拍仪没有加载成功"
+//            Toast.makeText(requireContext(), hint, Toast.LENGTH_SHORT).show()
+//        }
     }
 
     override fun onStop() {
         super.onStop()
 //        LogUtils.d(TAG, "onStop")
 //        UVCCameraUtil.releaseRGBCamera()
-//        mUSBMonitor.unregister()
+//        UVCCameraUtil.releaseHighCamera()
+//        mUSBMonitor?.unregister()
     }
 
     class ScannedItemAdapter :
@@ -323,5 +493,10 @@ class ScannerFragment : Fragment() {
             val textview = binding.textview
     }
 
+    override fun onViewClick(mode: CaptureMediaView.CaptureMode?) {
+        TODO("Not yet implemented")
+    }
+
 
 }
+

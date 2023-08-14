@@ -1,10 +1,11 @@
-import com.google.protobuf.gradle.*
+//import com.google.protobuf.gradle.*
+
 
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.kotlinAndroid)
-    alias(libs.plugins.protobuf)
+//    alias(libs.plugins.protobuf)
 }
 
 android {
@@ -19,6 +20,10 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+//        ndk{
+//            abiFilters 'armeabi-v7a','arm64-v8a'
+//        }
     }
 
     buildTypes {
@@ -62,9 +67,11 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
 //    implementation(libs.androidx.datastore)
 
+    implementation("androidx.work:work-runtime-ktx:2.7.1")
 
 
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
+
+//    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 
     implementation(libs.okhttp)
 //    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4") // 协程(版本自定)
@@ -77,6 +84,8 @@ dependencies {
 //    implementation("io.grpc:grpc-protobuf:1.45.1")
 
     implementation(libs.gson)
+
+    implementation("com.github.jiangdongguo.AndroidUSBCamera:libausbc:3.3.3")
 
 }
 
@@ -98,35 +107,35 @@ dependencies {
 //    }
 //}
 //
-protobuf {
-    protoc {
-        // The artifact spec for the Protobuf Compiler
-        artifact = "com.google.protobuf:protoc:3.19.3"
-    }
-    plugins {
-        // Optional: an artifact spec for a protoc plugin, with "grpc" as
-        // the identifier, which can be referred to in the "plugins"
-        // container of the "generateProtoTasks" closure.
-        id("grpc") {
-            artifact = "io.grpc:protoc-gen-grpc-java:1.15.1"
-        }
-    }
-
-
-    generateProtoTasks {
-        all().forEach {
-            it.plugins {
-                id("grpc"){}
-            }
-        }
-//        ofSourceSet("main").forEach {
-//            it.plugins {
-//                // Apply the "grpc" plugin whose spec is defined above, without
-//                // options. Note the braces cannot be omitted, otherwise the
-//                // plugin will not be added. This is because of the implicit way
-//                // NamedDomainObjectContainer binds the methods.
-//                id("grpc") { }
-//            }
-//        }
-    }
-}
+//protobuf {
+//    protoc {
+//        // The artifact spec for the Protobuf Compiler
+//        artifact = "com.google.protobuf:protoc:3.19.3"
+//    }
+//    plugins {
+//        // Optional: an artifact spec for a protoc plugin, with "grpc" as
+//        // the identifier, which can be referred to in the "plugins"
+//        // container of the "generateProtoTasks" closure.
+////        id("grpc") {
+////            artifact = "io.grpc:protoc-gen-grpc-java:1.15.1"
+////        }
+//    }
+//
+//
+//    generateProtoTasks {
+////        all().forEach {
+////            it.plugins {
+////                id("grpc"){}
+////            }
+////        }
+////        ofSourceSet("main").forEach {
+////            it.plugins {
+////                // Apply the "grpc" plugin whose spec is defined above, without
+////                // options. Note the braces cannot be omitted, otherwise the
+////                // plugin will not be added. This is because of the implicit way
+////                // NamedDomainObjectContainer binds the methods.
+////                id("grpc") { }
+////            }
+////        }
+//    }
+//}

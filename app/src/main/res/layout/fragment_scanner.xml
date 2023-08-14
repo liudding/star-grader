@@ -61,17 +61,31 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+<!--    <FrameLayout-->
+<!--        android:id="@+id/cameraViewContainer"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="0dp"-->
+<!--        android:background="@color/black"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        />-->
+
     <FrameLayout
+        android:id="@+id/cameraViewContainer"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:background="@color/black"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toRightOf="@id/sidebar"
         app:layout_constraintRight_toRightOf="parent">
 
-        <TextureView
-            android:id="@+id/camera_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+<!--        <TextureView-->
+<!--            android:id="@+id/camera_view"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="match_parent" />-->
     </FrameLayout>
 
 

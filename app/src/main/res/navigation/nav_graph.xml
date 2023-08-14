@@ -15,6 +15,10 @@
         <action
             android:id="@+id/action_HomeFragment_to_ScannerFragment"
             app:destination="@id/ScannerFragment" />
+
+<!--        <action-->
+<!--            android:id="@+id/action_HomeFragment_to_DemoFragment"-->
+<!--            app:destination="@id/DemoFragment" />-->
     </fragment>
     <fragment
         android:id="@+id/ScannerFragment"
@@ -34,4 +38,13 @@
         tools:layout="@layout/fragment_login">
 
     </fragment>
+
+<!--    <fragment-->
+<!--        android:id="@+id/DemoFragment"-->
+<!--        android:name="com.nxlinkstar.stargrader.ui.DemoFragment"-->
+<!--        android:label="Demo"-->
+<!--        tools:layout="@layout/fragment_scanner">-->
+
+<!--    </fragment>-->
+
 </navigation>

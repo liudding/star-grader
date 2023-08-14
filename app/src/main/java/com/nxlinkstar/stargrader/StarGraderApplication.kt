@@ -3,6 +3,7 @@ package com.nxlinkstar.stargrader
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
+import com.jiangdg.ausbc.utils.ToastUtils
 
 class StarGraderApplication: Application() {
 
@@ -18,5 +19,10 @@ class StarGraderApplication: Application() {
 
     init {
         context = this
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        ToastUtils.init(this)
     }
 }

@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.nxlinkstar.stargrader.databinding.FragmentPickerBinding
 import com.nxlinkstar.stargrader.databinding.FragmentPickerItemBinding
-import com.serenegiant.usb.Size
 
 const val ARG_ITEMS = "item_count"
 
